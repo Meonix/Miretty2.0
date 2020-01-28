@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/private_message_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/profile"
+            app:layout_constraintHorizontal_chainStyle="packed" />
+
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/receiver_message_card"
+            android:layout_width="wrap_content"
+            android:layout_toEndOf="@id/private_message_image"
+            android:layout_marginTop="17dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            app:cardBackgroundColor="#FFC9C8C6"
+            app:cardCornerRadius="20dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:orientation="vertical"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/receiver_private_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="false"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="#FF000000"
+                    android:textSize="20sp"
+                    android:textStyle="normal"
+                    tools:text="Receiver text" />
+
+                <ImageView
+                    android:id="@+id/imageOfReceiver"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <VideoView
+                    android:id="@+id/videoOfReceiver"
+                    android:layout_width="270dp"
+                    android:layout_height="270dp"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/audioOfReceiver"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="#00000000"
+                    android:src="@drawable/continuebtn"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/private_message_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:layout_toStartOf="@id/private_message_time"
+        android:layout_below="@id/sender_message_card"
+        android:layout_marginRight="15dp"
+        tools:text="Date" />
+
+    <TextView
+        android:id="@+id/private_message_time"
+        android:layout_below="@id/sender_message_card"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="4:51 PM" />
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/sender_message_card"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="17dp"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="20dp"
+        android:layout_alignParentEnd="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/sender_private_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="normal"
+                tools:text="Receiver text" />
+
+            <ImageView
+                android:id="@+id/imageOfSender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <VideoView
+                android:id="@+id/videoOfSender"
+                android:layout_width="270dp"
+                android:layout_height="270dp"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/audioOfSender"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="#00000000"
+                android:src="@drawable/continuebtn"
+                android:visibility="gone" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</RelativeLayout>

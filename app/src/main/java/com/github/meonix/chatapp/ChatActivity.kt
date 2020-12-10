@@ -48,18 +48,17 @@ import java.util.Calendar
 import java.util.HashMap
 
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.custom_chat_bar.*
 
 class ChatActivity : AppCompatActivity() {
-    private var messageReceiverID: String? = null
-    private var messageReceiverName: String? = null
-    private var messageuserImage: String? = null
-    private var messageSenderID: String? = null
-    private var currentDate: String? = null
-    private var currentTime: String? = null
-    private var currentUser: String? = null
-    private var userName: TextView? = null
-    private var userLastSeen: TextView? = null
-    private var userImage: CircleImageView? = null
+    private var messageReceiverID: String = ""
+    private var messageReceiverName: String = ""
+    private var messageUserImage: String = ""
+    private var messageSenderID: String = ""
+    private var currentDate: String = ""
+    private var currentTime: String = ""
+    private var currentUser: String = ""
     private var RootRef: DatabaseReference? = null
     private var AudioRef: DatabaseReference? = null
     private var MessageAudioRef: DatabaseReference? = null
@@ -71,14 +70,7 @@ class ChatActivity : AppCompatActivity() {
     private var audioPrivateChat: StorageReference? = null
     private var ImagePrivateChat: StorageReference? = null
     private var videoPrivateChat: StorageReference? = null
-    private var sendMessagebutton: ImageButton? = null
-    private var audioMessageButton: ImageButton? = null
-    private var imageMessageButton: ImageButton? = null
-    private var btn_videocCall: ImageButton? = null
-    private var messageInputText: EditText? = null
-    private val messagelist = ArrayList<MessagesChatModel>()
-    private var messageAdapter: messagePrivateChatAdapter? = null
-    private var private_message_chat: RecyclerView? = null
+    private val messagelist = mutableListOf<MessagesChatModel>()
     private var mRecorder: MediaRecorder? = null
     private var permissionToRecordAccepted = false
     private var mProgress: ProgressDialog? = null
@@ -90,8 +82,7 @@ class ChatActivity : AppCompatActivity() {
         setContentView(R.layout.activity_chat)
         messageReceiverID = intent.extras!!.get("visit_user_id")!!.toString()
         messageReceiverName = intent.extras!!.get("visit_user_name")!!.toString()
-        messageuserImage = intent.extras!!.get("userImage")!!.toString()
-        btn_videocCall = findViewById(R.id.btn_videoCall)!!
+        messageUserImage = intent.extras!!.get("userImage")!!.toString()
 
         mAuth = FirebaseAuth.getInstance()
         audioPrivateChat = FirebaseStorage.getInstance().reference.child("Audio Messages")
@@ -108,32 +99,30 @@ class ChatActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION)
 
 
-        private_message_chat!!.adapter = messageAdapter!!
+        userName.text = messageReceiverName
+        Picasso.get().load(messageUserImage).placeholder(R.drawable.profile).into(userImage)
 
-        userName!!.text = messageReceiverName!!
-        Picasso.get().load(messageuserImage).placeholder(R.drawable.profile).into(userImage)
-
-        sendMessagebutton!!.setOnClickListener {
-            SendMessage()
-            private_message_chat!!.post {
-                private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
-                private_message_chat!!.scrollToPosition(private_message_chat!!.adapter!!.itemCount - 1)
+        sendMessagebutton.setOnClickListener {
+            sendMessage()
+            privateMessageChat.post {
+//                private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
+                privateMessageChat!!.scrollToPosition(privateMessageChat!!.adapter!!.itemCount)
             }
         }
-        messageInputText!!.setOnClickListener {
-            private_message_chat!!.post {
-                private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
-                private_message_chat!!.scrollToPosition(private_message_chat!!.adapter!!.itemCount - 1)
+        messageInputText.setOnClickListener {
+            privateMessageChat.post {
+//                private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
+                privateMessageChat.scrollToPosition(privateMessageChat!!.adapter!!.itemCount)
             }
         }
 
-        btn_videocCall!!.setOnClickListener {
+        btnVideoCall.setOnClickListener {
             val findfriendsIntent = Intent(this@ChatActivity, ViceoCall_Activity::class.java)
             startActivity(findfriendsIntent)
         }
 
 
-        audioMessageButton!!.setOnTouchListener { v, event ->
+        audioMessageButton.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
 
                 startRecording()
@@ -146,7 +135,7 @@ class ChatActivity : AppCompatActivity() {
             false
         }
 
-        imageMessageButton!!.setOnClickListener {
+        imageMessageButton.setOnClickListener {
             val GIntent = Intent()
             GIntent.action = Intent.ACTION_GET_CONTENT
             GIntent.type = "*/*"
@@ -155,17 +144,17 @@ class ChatActivity : AppCompatActivity() {
 
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.stackFromEnd = true
-        private_message_chat!!.layoutManager = linearLayoutManager
+        privateMessageChat.layoutManager = linearLayoutManager
 
         messagelist.clear()
-        RootRef!!.child("Messages").child(messageSenderID!!).child(messageReceiverID!!).addChildEventListener(object : ChildEventListener {
+        RootRef!!.child("Messages").child(messageSenderID).child(messageReceiverID!!).addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, s: String?) {
                 val message = dataSnapshot!!.getValue<MessagesChatModel>(MessagesChatModel::class.java)
                 messagelist.add(message!!)
-                messageAdapter!!.notifyDataSetChanged()
-                private_message_chat!!.post {
-                    private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
-                    private_message_chat!!.scrollToPosition(private_message_chat!!.adapter!!.itemCount - 1)
+                privateMessageChat.adapter?.notifyDataSetChanged()
+                privateMessageChat.post {
+//                    private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
+                    privateMessageChat.scrollToPosition(messagelist.size-1)
                 }
             }
 
@@ -220,10 +209,10 @@ class ChatActivity : AppCompatActivity() {
                             val currentTimeFormat = SimpleDateFormat("hh:mm ss a")
                             currentTime = currentTimeFormat.format(calForTime.time)
                             val messageTextBody = HashMap<String,Any>()
-                            messageTextBody["from_uid"] = messageSenderID!!
+                            messageTextBody["from_uid"] = messageSenderID
                             messageTextBody["message"] = downloadUrl
-                            messageTextBody["date"] = currentDate!!
-                            messageTextBody["time"] = currentTime!!
+                            messageTextBody["date"] = currentDate
+                            messageTextBody["time"] = currentTime
                             messageTextBody["type"] = "image"
                             val messageBodyDetails = HashMap<String,Any>()
                             messageBodyDetails["$messageSenderRef/$messagePushID"] = messageTextBody
@@ -235,9 +224,9 @@ class ChatActivity : AppCompatActivity() {
             } else if (Type.contains("video/")) {
                 if (UriImageMessage != null) {
                     ImageRef = RootRef!!.child("Messages")
-                            .child(messageSenderID!!).child(messageReceiverID!!).push()
+                            .child(messageSenderID).child(messageReceiverID).push()
                     val messagePushID = ImageRef!!.key
-                    val red = videoPrivateChat!!.child(currentUser!!).child("$messagePushID.mp4")
+                    val red = videoPrivateChat!!.child(currentUser).child("$messagePushID.mp4")
                     red.putFile(UriImageMessage!!).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val downloadUrl = task.result.downloadUrl!!.toString()
@@ -255,10 +244,10 @@ class ChatActivity : AppCompatActivity() {
                             val currentTimeFormat = SimpleDateFormat("hh:mm ss a")
                             currentTime = currentTimeFormat.format(calForTime.time)
                             val messageTextBody = HashMap<String,Any>()
-                            messageTextBody["from_uid"] = messageSenderID!!
+                            messageTextBody["from_uid"] = messageSenderID
                             messageTextBody["message"] = downloadUrl
-                            messageTextBody["date"] = currentDate!!
-                            messageTextBody["time"] = currentTime!!
+                            messageTextBody["date"] = currentDate
+                            messageTextBody["time"] = currentTime
                             messageTextBody["type"] = "video"
                             val messageBodyDetails = HashMap<String,Any>()
                             messageBodyDetails["$messageSenderRef/$messagePushID"] = messageTextBody
@@ -314,9 +303,9 @@ class ChatActivity : AppCompatActivity() {
         mProgress!!.setMessage("Sending Your Audio....")
         mProgress!!.show()
         AudioRef = RootRef!!.child("Messages")!!
-                .child(messageSenderID!!).child(messageReceiverID!!).push()!!
+                .child(messageSenderID).child(messageReceiverID).push()!!
         val messagePushID = AudioRef!!.key!!
-        val filepath = audioPrivateChat!!.child(currentUser!!).child("$messagePushID.mp3")
+        val filepath = audioPrivateChat!!.child(currentUser).child("$messagePushID.mp3")
         val uri = Uri.fromFile(File(mFileName))!!
 
         filepath.putFile(uri).addOnCompleteListener { task ->
@@ -336,8 +325,8 @@ class ChatActivity : AppCompatActivity() {
             }
 
 
-            val AudiodownloadUrl = task.result.downloadUrl!!.toString()
-            MessageAudioRef = RootRef!!.child("Messages").child(messageSenderID!!).child(messageReceiverID!!).child(messagePushID)
+            val audioDownloadUrl = task.result.downloadUrl!!.toString()
+            MessageAudioRef = RootRef!!.child("Messages").child(messageSenderID).child(messageReceiverID!!).child(messagePushID)
 
             val messageSenderRef = "Messages/$messageSenderID/$messageReceiverID"
             val messageReceiverRef = "Messages/$messageReceiverID/$messageSenderID"
@@ -349,10 +338,10 @@ class ChatActivity : AppCompatActivity() {
             val currentTimeFormat = SimpleDateFormat("hh:mm ss a")
             currentTime = currentTimeFormat.format(calForTime.time)
             val messageTextBody = HashMap<String,Any>()
-            messageTextBody["from_uid"] = messageSenderID!!
-            messageTextBody["message"] = AudiodownloadUrl
-            messageTextBody["date"] = currentDate!!
-            messageTextBody["time"] = currentTime!!
+            messageTextBody["from_uid"] = messageSenderID
+            messageTextBody["message"] = audioDownloadUrl
+            messageTextBody["date"] = currentDate
+            messageTextBody["time"] = currentTime
             messageTextBody["type"] = "audio"
             val messageBodyDetails = HashMap<String,Any>()
             messageBodyDetails["$messageSenderRef/$messagePushID"] = messageTextBody
@@ -372,8 +361,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun SendMessage() {
-        val messageTExt = messageInputText!!.text.toString()
+    private fun sendMessage() {
+        val messageTExt = messageInputText.text.toString()
         if (TextUtils.isEmpty(messageTExt)) {
             Toast.makeText(this, "write your message ....", Toast.LENGTH_SHORT).show()
         } else {
@@ -407,7 +396,7 @@ class ChatActivity : AppCompatActivity() {
             NoitificationRef!!.child(messageReceiverID!!).push()
                     .setValue(chatnotificationHasmap)
 
-            messageInputText!!.setText("")
+            messageInputText.setText("")
         }
     }
 
@@ -425,15 +414,9 @@ class ChatActivity : AppCompatActivity() {
         val actionBarView = layoutInflater.inflate(R.layout.custom_chat_bar, null)
         actionbar.customView = actionBarView!!
 
-        imageMessageButton = findViewById(R.id.image_message_btn)
-        audioMessageButton = findViewById(R.id.audio_message_btn)
-        userImage = findViewById(R.id.custom_profile_image)
-        private_message_chat = findViewById(R.id.private_message)
-        userName = findViewById(R.id.custom_profile_name)
-        userLastSeen = findViewById(R.id.user_last_seen)
-        sendMessagebutton = findViewById(R.id.send_message_btn)
-        messageInputText = findViewById(R.id.input_message)
-        messageAdapter = messagePrivateChatAdapter(messagelist)
+
+        val messageAdapter = messagePrivateChatAdapter(messagelist)
+        privateMessageChat.adapter = messageAdapter
 
     }
 
@@ -441,10 +424,10 @@ class ChatActivity : AppCompatActivity() {
         super.onStart()
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.stackFromEnd = true
-        private_message_chat!!.layoutManager = linearLayoutManager
-        private_message_chat!!.post {
-            private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
-            private_message_chat!!.scrollToPosition(private_message_chat!!.adapter!!.itemCount - 1)
+        privateMessageChat!!.layoutManager = linearLayoutManager
+        privateMessageChat!!.post {
+//            private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
+            privateMessageChat!!.scrollToPosition(privateMessageChat!!.adapter!!.itemCount)
         }
     }
 

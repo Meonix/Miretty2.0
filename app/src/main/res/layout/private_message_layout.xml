@@ -21,20 +21,18 @@
             app:layout_constraintHorizontal_chainStyle="packed" />
 
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/receiver_message_card"
             android:layout_width="wrap_content"
             android:layout_toEndOf="@id/private_message_image"
             android:layout_marginTop="17dp"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
             app:cardBackgroundColor="#FFC9C8C6"
             app:cardCornerRadius="20dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
                 android:orientation="vertical"
                 android:paddingStart="12dp"
                 android:paddingTop="8dp"
@@ -72,7 +70,7 @@
                     android:visibility="gone" />
             </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
     <TextView
@@ -93,7 +91,7 @@
         android:layout_height="wrap_content"
         tools:text="4:51 PM" />
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/sender_message_card"
         android:layout_width="wrap_content"
         android:layout_marginTop="17dp"
@@ -105,7 +103,6 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
             android:orientation="vertical"
             android:paddingStart="12dp"
             android:paddingTop="8dp"
@@ -142,5 +139,5 @@
                 android:src="@drawable/continuebtn"
                 android:visibility="gone" />
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </RelativeLayout>

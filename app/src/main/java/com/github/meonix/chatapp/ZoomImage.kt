@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Environment
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.View

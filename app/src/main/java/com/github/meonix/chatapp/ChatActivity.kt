@@ -12,12 +12,12 @@ import android.graphics.Matrix
 import android.media.MediaRecorder
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -91,7 +91,7 @@ class ChatActivity : AppCompatActivity() {
         NoitificationRef = FirebaseDatabase.getInstance().reference.child("Notifications")
         messageSenderID = mAuth!!.currentUser!!.uid
 
-        currentUser = messageSenderID!!
+        currentUser = messageSenderID
         mProgress = ProgressDialog(this)
 
         RootRef = FirebaseDatabase.getInstance().reference!!
@@ -143,11 +143,11 @@ class ChatActivity : AppCompatActivity() {
         }
 
         val linearLayoutManager = LinearLayoutManager(this)
-        linearLayoutManager.stackFromEnd = true
+//        linearLayoutManager.stackFromEnd = true
         privateMessageChat.layoutManager = linearLayoutManager
 
         messagelist.clear()
-        RootRef!!.child("Messages").child(messageSenderID).child(messageReceiverID!!).addChildEventListener(object : ChildEventListener {
+        RootRef!!.child("Messages").child(messageSenderID).child(messageReceiverID).addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(dataSnapshot: DataSnapshot?, s: String?) {
                 val message = dataSnapshot!!.getValue<MessagesChatModel>(MessagesChatModel::class.java)
                 messagelist.add(message!!)
@@ -424,7 +424,7 @@ class ChatActivity : AppCompatActivity() {
         super.onStart()
         val linearLayoutManager = LinearLayoutManager(this)
         linearLayoutManager.stackFromEnd = true
-        privateMessageChat!!.layoutManager = linearLayoutManager
+        privateMessageChat.layoutManager = linearLayoutManager
         privateMessageChat!!.post {
 //            private_message_chat!!.smoothScrollToPosition(private_message_chat!!.adapter!!.itemCount)
             privateMessageChat!!.scrollToPosition(privateMessageChat!!.adapter!!.itemCount)

@@ -4,8 +4,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
-import android.support.v7.widget.CardView
-import android.support.v7.widget.RecyclerView
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +29,7 @@ import java.io.IOException
 
 import de.hdodenhof.circleimageview.CircleImageView
 
-public class messagePrivateChatAdapter( val userMessageList: List<MessagesChatModel>) : RecyclerView.Adapter<messagePrivateChatAdapter.MessageViewHolder>() {
+class messagePrivateChatAdapter(private val userMessageList: List<MessagesChatModel>) : RecyclerView.Adapter<messagePrivateChatAdapter.MessageViewHolder>() {
     private val mAuth: FirebaseAuth
     private var usersRef: DatabaseReference? = null
     private var mPlayer: MediaPlayer? = null

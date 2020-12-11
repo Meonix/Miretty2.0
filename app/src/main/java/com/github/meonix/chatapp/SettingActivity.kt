@@ -7,9 +7,9 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
+import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View

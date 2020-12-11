@@ -1,15 +1,20 @@
 package com.github.meonix.chatapp
 
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.provider.Settings
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
@@ -35,7 +40,10 @@ class ChatsFragment : Fragment() {
     private var UserRef: DatabaseReference? = null
     private var mAuth: FirebaseAuth? = null
     private var currentUserID: String? = null
-
+    companion object {
+        /*  Permission request code to draw over other apps  */
+        private const val DRAW_OVER_OTHER_APP_PERMISSION_REQUEST_CODE = 1222
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -50,12 +58,48 @@ class ChatsFragment : Fragment() {
         return PrivateChatView
     }
 
+    fun createFloatingWidget(view: View?, usersIDs: String, Name: String, userImage: String) {
+        //Check if the application has draw over other apps permission or not?
+        //This permission is by default available for API<23. But for API > 23
+        //you have to ask for the permission in runtime.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(context)) {
+            //If the draw over permission is not available open the settings screen
+            //to grant the permission.
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:${context?.packageName}"))
+            startActivityForResult(intent, DRAW_OVER_OTHER_APP_PERMISSION_REQUEST_CODE)
+        }  //If permission is granted start floating widget service
+        else{
+            startFloatingWidgetService(usersIDs,Name,userImage)
+        }
+    }
+    private fun startFloatingWidgetService(usersIDs: String, Name: String, userImage: String) {
+        val intent = Intent(context, FloatingWidgetService::class.java)
+        intent.putExtra("visit_user_id", usersIDs)
+        intent.putExtra("visit_user_name", Name)
+        intent.putExtra("userImage", userImage)
 
+        context?.startService(intent)
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == DRAW_OVER_OTHER_APP_PERMISSION_REQUEST_CODE) {
+            //Check if the permission is granted or not.
+            if (resultCode == RESULT_OK) //If permission granted start floating widget service
+                Toast.makeText(context, getString(R.string.permission_success), Toast.LENGTH_SHORT).show()
+//                startFloatingWidgetService(usersIDs, Name, s)
+            else  //Permission is not available then display toast
+                Toast.makeText(context,
+                        resources.getString(R.string.draw_other_app_permission_denied),
+                        Toast.LENGTH_SHORT).show()
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
     override fun onStart() {
         super.onStart()
 
         val options = FirebaseRecyclerOptions.Builder<ContactsModel>()
-                .setQuery(ChatRef!!, ContactsModel::class.java!!)
+                .setQuery(ChatRef!!, ContactsModel::class.java)
                 .build()
         val adapter = object : FirebaseRecyclerAdapter<ContactsModel, ChatsViewHolder>(options) {
             override fun onBindViewHolder(holder: ChatsViewHolder, position: Int, model: ContactsModel) {
@@ -80,6 +124,11 @@ class ChatsFragment : Fragment() {
                                 chatItem.putExtra("visit_user_name", Name)
                                 chatItem.putExtra("userImage", Image[0])
                                 startActivity(chatItem)
+                            }
+                            holder.itemView.setOnLongClickListener {
+                                Toast.makeText(context, "long click", Toast.LENGTH_SHORT).show()
+                                createFloatingWidget(it,usersIDs,Name,Image[0])
+                                return@setOnLongClickListener true
                             }
                         }
 

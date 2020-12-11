@@ -12,7 +12,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ProfileActivity">
@@ -116,5 +116,5 @@
             android:visibility="invisible"/>
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

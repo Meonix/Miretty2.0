@@ -1,9 +1,7 @@
 package com.github.meonix.chatapp
 
-import android.content.DialogInterface
 import android.content.Intent
 import com.google.android.material.tabs.TabLayout
-import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,12 +9,9 @@ import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
@@ -24,69 +19,66 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var mToolbar: Toolbar? = null
-    private var myViewPage: ViewPager? = null
-    private var myTablayout: TabLayout? = null
     private var mytabsAccessorAdapter: TabsAccessorAdapter? = null
 
     private var currentUser: FirebaseUser? = null
     private var mAuth: FirebaseAuth? = null
-    private var RootRef: DatabaseReference? = null
+    private var rootRef: DatabaseReference? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mAuth = FirebaseAuth.getInstance()
-        currentUser = mAuth!!.currentUser
+        currentUser = mAuth?.currentUser
 
-        RootRef = FirebaseDatabase.getInstance().reference
+        rootRef = FirebaseDatabase.getInstance().reference
 
-        mToolbar = findViewById(R.id.main_page_toolbar)
-        setSupportActionBar(mToolbar)
-        supportActionBar!!.setTitle("Miretty")
+        setSupportActionBar(main_page_toolbar as Toolbar)
+        supportActionBar?.title = getString(R.string.name_app)
 
-        myViewPage = findViewById(R.id.main_tabs_pager)
         mytabsAccessorAdapter = TabsAccessorAdapter(supportFragmentManager)
-        myViewPage!!.adapter = mytabsAccessorAdapter
+        mainTabsPager.adapter = mytabsAccessorAdapter
 
         //when we go back the main activity  we will back old position
-        myViewPage!!.currentItem = myViewPage!!.currentItem
+        mainTabsPager.currentItem = mainTabsPager.currentItem
 
-        myTablayout = findViewById(R.id.main_tabs)
-        myTablayout!!.setupWithViewPager(myViewPage)
+        main_tabs.setupWithViewPager(mainTabsPager)
 
-        val ICONS = intArrayOf(R.drawable.chatfragment, R.drawable.groupchatfragment, R.drawable.contactfragment, R.drawable.requestfragment)
+        val icons = intArrayOf(R.drawable.chatfragment, R.drawable.groupchatfragment, R.drawable.contactfragment, R.drawable.requestfragment)
 
         //Get reference to your Tablayout
 
-        myTablayout!!.getTabAt(0)!!.setIcon(ICONS[0])
-        myTablayout!!.getTabAt(1)!!.setIcon(ICONS[1])
-        myTablayout!!.getTabAt(2)!!.setIcon(ICONS[2])
-        myTablayout!!.getTabAt(3)!!.setIcon(ICONS[3])
+        main_tabs.getTabAt(0)?.setIcon(icons[0])
+        main_tabs.getTabAt(1)?.setIcon(icons[1])
+        main_tabs.getTabAt(2)?.setIcon(icons[2])
+        main_tabs.getTabAt(3)?.setIcon(icons[3])
     }
 
     override fun onStart() {
         super.onStart()
         if (currentUser == null) {
-            SendUserToLoginActivity()
+            sendUserToLoginActivity()
         } else {
-            VerifyUserExistance()
+            verifyUserExistence()
         }
     }
 
-    private fun VerifyUserExistance() {
-        val currentUerID = mAuth!!.currentUser!!.uid
+    private fun verifyUserExistence() {
+        val currentUerID = mAuth?.currentUser?.uid
 
-        RootRef!!.child("Users").child(currentUerID).addValueEventListener(object : ValueEventListener {
+        rootRef?.child("Users")?.child(currentUerID)?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.child("name").exists()) {
-                    Toast.makeText(this@MainActivity, "Welcome" + "  " + dataSnapshot.child("name").value!!.toString(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity,
+                            "Welcome" + "  " + dataSnapshot.child("name")
+                                    .value.toString(), Toast.LENGTH_SHORT).show()
                 } else {
-                    SendUserToSettingsActivity()
+                    sendUserToSettingsActivity()
                 }
             }
 
@@ -106,14 +98,14 @@ class MainActivity : AppCompatActivity() {
         super.onOptionsItemSelected(item)
 
         if (item.itemId == R.id.main_find_logout_option) {
-            mAuth!!.signOut()
-            SendUserToLoginActivity()
+            mAuth?.signOut()
+            sendUserToLoginActivity()
         }
         if (item.itemId == R.id.main_settings_option) {
-            SendUserToSettingsActivity()
+            sendUserToSettingsActivity()
         }
         if (item.itemId == R.id.main_find_friends_option) {
-            SendUsertoFindFriendsActivity()
+            sendUserToFindFriendsActivity()
         }
         if (item.itemId == R.id.main_create_group_option) {
             RequestNewGroup()
@@ -135,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Please write Group Name", Toast.LENGTH_SHORT).show()
 
             } else {
-                CreateNewGroup(groupName)
+                createNewGroup(groupName)
             }
         }
 
@@ -143,8 +135,8 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
-    private fun CreateNewGroup(groupName: String) {
-        RootRef!!.child("Group").child(groupName).setValue("").addOnCompleteListener { task ->
+    private fun createNewGroup(groupName: String) {
+        rootRef?.child("Group")?.child(groupName)?.setValue("")?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Toast.makeText(this@MainActivity, groupName + "is Created Successfully...", Toast.LENGTH_SHORT).show()
             }
@@ -152,22 +144,21 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun SendUserToLoginActivity() {
+    private fun sendUserToLoginActivity() {
         val loginIntent = Intent(this@MainActivity, LoginActivity::class.java)
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(loginIntent)
         finish()
     }
 
-    private fun SendUserToSettingsActivity() {
+    private fun sendUserToSettingsActivity() {
         val settingIntent = Intent(this@MainActivity, SettingActivity::class.java)
-        //        settingIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(settingIntent)
     }
 
-    private fun SendUsertoFindFriendsActivity() {
-        val findfriendsIntent = Intent(this@MainActivity, FindFriendsActivity::class.java)
-        startActivity(findfriendsIntent)
+    private fun sendUserToFindFriendsActivity() {
+        val findFriendsIntent = Intent(this@MainActivity, FindFriendsActivity::class.java)
+        startActivity(findFriendsIntent)
     }
 
 }
